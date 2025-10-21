@@ -1,9 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 CORS(app)
+
+# Serve frontend
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 # --- Echo Service ---
 @app.route("/echo", methods=["POST"])
