@@ -1,55 +1,43 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-
-# Your other service imports
-# Example: import credit_card_validator, ip2geo, calculator
-# You can adjust according to your actual service code
+import requests
 
 app = Flask(__name__)
 CORS(app)
 
-# Home route
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# Echo test route
-@app.route('/echo', methods=['POST'])
+# --- Echo Service ---
+@app.route("/echo", methods=["POST"])
 def echo():
-    data = request.json
-    return jsonify({"received": data})
+    data = request.json.get("text", "")
+    return jsonify({"echo": data})
 
-# Example: Credit Card Validator API
-@app.route('/validate-card', methods=['POST'])
+# --- Credit Card Validator ---
+@app.route("/validate_card", methods=["POST"])
 def validate_card():
-    data = request.json
-    card_number = data.get('card_number')
-    # Dummy validation logic
-    if card_number and card_number.isdigit() and len(card_number) in [13, 16, 19]:
-        return jsonify({"valid": True})
-    return jsonify({"valid": False})
+    card_number = request.json.get("card_number", "")
+    is_valid = card_number.isdigit() and 13 <= len(card_number) <= 19
+    return jsonify({"valid": is_valid})
 
-# Example: IP to Geo API
-@app.route('/ip-geo', methods=['POST'])
-def ip_geo():
-    data = request.json
-    ip = data.get('ip')
-    # Dummy response
-    return jsonify({"ip": ip, "country": "Unknown", "city": "Unknown"})
+# --- IP to Geo (using ip-api.com) ---
+@app.route("/ip_to_geo", methods=["POST"])
+def ip_to_geo():
+    ip = request.json.get("ip", "")
+    response = requests.get(f"http://ip-api.com/json/{ip}").json()
+    return jsonify({
+        "city": response.get("city", "Unknown"),
+        "country": response.get("country", "Unknown"),
+        "ip": ip
+    })
 
-# Example: Simple Calculator API
-@app.route('/calculate', methods=['POST'])
+# --- Calculator Service ---
+@app.route("/calculate", methods=["POST"])
 def calculate():
-    data = request.json
-    expression = data.get('expression')
+    expr = request.json.get("expression", "")
     try:
-        # WARNING: Using eval is dangerous in production, sanitize input!
-        result = eval(expression)
+        result = eval(expr, {"__builtins__": {}})
         return jsonify({"result": result})
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# Add more services here following the same pattern
-
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
