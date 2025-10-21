@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Study Helper</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="p-6 bg-gray-100">
+<div id="root"></div>
+
+<script type="text/babel">
+const App = () => {
+  const [numberResult, setNumberResult] = React.useState(null)
+  const [defineResult, setDefineResult] = React.useState(null)
+  const [caseResult, setCaseResult] = React.useState(null)
+  const [calcResult, setCalcResult] = React.useState(null)
+
+  const apiCall = async (url, method, body) => {
+    const res = await fetch(url, {
+      method,
+      headers: {'Content-Type':'application/json'},
+      body: body ? JSON.stringify(body) : null
+    })
+    return res.json()
+  }
+
+  const handleNumber = async (e) => {
+    e.preventDefault()
+    const data = { number: parseInt(e.target.number.value) }
+    const result = await apiCall('/number-to-words', 'POST', data)
+    setNumberResult(result)
+  }
+
+  const handleDefine = async (e) => {
+    e.preventDefault()
+    const data = { word: e.target.word.value }
+    const result = await apiCall('/define-word', 'POST', data)
+    setDefineResult(result)
+  }
+
+  const handleTextCase = async (e) => {
+    e.preventDefault()
+    const data = { text: e.target.text.value, case_type: e.target.case_type.value }
+    const result = await apiCall('/text-case', 'POST', data)
+    setCaseResult(result)
+  }
+
+  const handleCalc = async (e) => {
+    e.preventDefault()
+    const data = { a: parseInt(e.target.a.value), b: parseInt(e.target.b.value), operation: e.target.operation.value }
+    const result = await apiCall('/calculate', 'POST', data)
+    setCalcResult(result)
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow space-y-6">
+      <h1 className="text-3xl font-bold text-center text-indigo-700">Smart Study Helper</h1>
+
+      {/* Number to Words */}
+      <form onSubmit={handleNumber} className="space-y-2">
+        <h2 className="text-xl font-semibold">Number to Words</h2>
+        <input type="number" name="number" className="p-2 border rounded w-full" placeholder="Enter number"/>
+        <button type="submit" className="bg-indigo-600 text-white p-2 rounded">Convert</button>
+        {numberResult && numberResult.words && <p className="mt-2 font-semibold">{numberResult.words}</p>}
+      </form>
+
+      {/* Dictionary */}
+      <form onSubmit={handleDefine} className="space-y-2">
+        <h2 className="text-xl font-semibold">Dictionary Lookup</h2>
+        <input type="text" name="word" className="p-2 border rounded w-full" placeholder="Enter word"/>
+        <button type="submit" className="bg-indigo-600 text-white p-2 rounded">Define</button>
+        {defineResult && defineResult.definitions && (
+          <ul className="mt-2 list-disc ml-5">{defineResult.definitions.map((d,i)=><li key={i}>{d}</li>)}</ul>
+        )}
+      </form>
+
+      {/* Text Casing */}
+      <form onSubmit={handleTextCase} className="space-y-2">
+        <h2 className="text-xl font-semibold">Text Casing</h2>
+        <input type="text" name="text" className="p-2 border rounded w-full" placeholder="Enter text"/>
+        <select name="case_type" className="p-2 border rounded w-full">
+          <option value="upper">Uppercase</option>
+          <option value="lower">Lowercase</option>
+          <option value="proper">Proper Case</option>
+        </select>
+        <button type="submit" className="bg-indigo-600 text-white p-2 rounded">Transform</button>
+        {caseResult && caseResult.result && <p className="mt-2 font-semibold">{caseResult.result}</p>}
+      </form>
+
+      {/* Calculator */}
+      <form onSubmit={handleCalc} className="space-y-2">
+        <h2 className="text-xl font-semibold">Calculator</h2>
+        <input type="number" name="a" className="p-2 border rounded w-full" placeholder="Number A"/>
+        <input type="number" name="b" className="p-2 border rounded w-full" placeholder="Number B"/>
+        <select name="operation" className="p-2 border rounded w-full">
+          <option value="add">Add</option>
+          <option value="subtract">Subtract</option>
+          <option value="multiply">Multiply</option>
+          <option value="divide">Divide</option>
+        </select>
+        <button type="submit" className="bg-indigo-600 text-white p-2 rounded">Calculate</button>
+        {calcResult && calcResult.result !== undefined && <p className="mt-2 font-semibold">{calcResult.result}</p>}
+      </form>
+    </div>
+  )
+}
+
+ReactDOM.render(<App />, document.getElementById('root'))
+</script>
+</body>
+</html>
