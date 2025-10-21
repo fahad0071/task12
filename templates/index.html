@@ -2,76 +2,81 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essential Services App</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; }
-        input, button { padding: 0.5rem; margin: 0.5rem 0; }
-        pre { background: #f4f4f4; padding: 1rem; }
+        body { font-family: Arial; margin: 20px; }
+        h2 { margin-top: 30px; }
+        input { margin-right: 10px; }
+        button { margin-right: 10px; }
+        pre { background: #f0f0f0; padding: 10px; }
     </style>
 </head>
 <body>
     <h1>Welcome to All Services App</h1>
 
     <h2>Echo</h2>
-    <input type="text" id="echoInput" placeholder="Enter something">
+    <input id="echo-input" placeholder="Enter something">
     <button onclick="sendEcho()">Send</button>
-    <pre id="echoResponse"></pre>
+    <pre id="echo-output"></pre>
 
     <h2>Credit Card Validator</h2>
-    <input type="text" id="cardInput" placeholder="Enter card number">
+    <input id="card-input" placeholder="Enter card number">
     <button onclick="validateCard()">Validate</button>
-    <pre id="cardResponse"></pre>
+    <pre id="card-output"></pre>
 
     <h2>IP to Geo</h2>
-    <input type="text" id="ipInput" placeholder="Enter IP">
-    <button onclick="getIPGeo()">Get Geo</button>
-    <pre id="ipResponse"></pre>
+    <input id="ip-input" placeholder="Enter IP">
+    <button onclick="getGeo()">Get Geo</button>
+    <pre id="ip-output"></pre>
 
     <h2>Calculator</h2>
-    <input type="text" id="calcInput" placeholder="Enter expression">
+    <input id="calc-input" placeholder="Enter expression">
     <button onclick="calculate()">Calculate</button>
-    <pre id="calcResponse"></pre>
+    <pre id="calc-output"></pre>
 
     <script>
         async function sendEcho() {
-            const val = document.getElementById('echoInput').value;
-            const res = await fetch('/echo', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({message: val})
+            const message = document.getElementById("echo-input").value;
+            const res = await fetch("/echo", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message})
             });
-            document.getElementById('echoResponse').textContent = JSON.stringify(await res.json(), null, 2);
+            const data = await res.json();
+            document.getElementById("echo-output").textContent = JSON.stringify(data, null, 2);
         }
 
         async function validateCard() {
-            const val = document.getElementById('cardInput').value;
-            const res = await fetch('/validate-card', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({card_number: val})
+            const card_number = document.getElementById("card-input").value;
+            const res = await fetch("/validate-card", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({card_number})
             });
-            document.getElementById('cardResponse').textContent = JSON.stringify(await res.json(), null, 2);
+            const data = await res.json();
+            document.getElementById("card-output").textContent = JSON.stringify(data, null, 2);
         }
 
-        async function getIPGeo() {
-            const val = document.getElementById('ipInput').value;
-            const res = await fetch('/ip-geo', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ip: val})
+        async function getGeo() {
+            const ip = document.getElementById("ip-input").value;
+            const res = await fetch("/ip-geo", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ip})
             });
-            document.getElementById('ipResponse').textContent = JSON.stringify(await res.json(), null, 2);
+            const data = await res.json();
+            document.getElementById("ip-output").textContent = JSON.stringify(data, null, 2);
         }
 
         async function calculate() {
-            const val = document.getElementById('calcInput').value;
-            const res = await fetch('/calculate', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({expression: val})
+            const expression = document.getElementById("calc-input").value;
+            const res = await fetch("/calculate", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({expression})
             });
-            document.getElementById('calcResponse').textContent = JSON.stringify(await res.json(), null, 2);
+            const data = await res.json();
+            document.getElementById("calc-output").textContent = JSON.stringify(data, null, 2);
         }
     </script>
 </body>
